@@ -38,6 +38,10 @@
 # Build data
 /build/
 
+# phpStorm
+.idea
+.idea/*
+
 # Composer PHAR
 /composer.phar
 
