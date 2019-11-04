@@ -1,0 +1,3 @@
+# config/services.yaml
+parameters:
+  acme.author.email: 'jonathan.kablan@gmail.com'
