@@ -11,7 +11,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class FastEntityBundle extends Bundle
 {
-    public const VERSION = '2.3.3-DEV';
+    public const VERSION = '2.0.0-DEV';
 
     public function boot()
     {
