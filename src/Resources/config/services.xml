@@ -9,5 +9,10 @@
             <argument>%kernel.project_dir%</argument>
             <tag name="console.command" command="magic:entity" />
         </service>
+
+        <service id="fastentity.config.manager" class="Jonathankablan\Bundle\FastEntityBundle\Configuration\ConfigManager" public="true">
+            <argument>%fastentity.config%</argument>
+            <argument>%kernel.debug%</argument>
+        </service>
     </services>
 </container>
