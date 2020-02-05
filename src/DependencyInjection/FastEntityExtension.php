@@ -7,13 +7,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
-/**
- * Resolves all the backend configuration values and most of the entities
- * configuration. The information that must resolved during runtime is handled
- * by the Configurator class.
- *
- * @author Javier Eguiluz <javier.eguiluz@gmail.com>
- */
 class FastEntityExtension extends Extension
 {
     /**
@@ -29,7 +22,6 @@ class FastEntityExtension extends Extension
         // load bundle's services
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.xml');
-        $loader->load('form.xml');
 
         if ($container->getParameter('kernel.debug')) {
             // in 'dev', use the built-in Symfony exception listener
