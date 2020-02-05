@@ -4,5 +4,10 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
+        <service id="fastentity.command.fast.entity" class="Jonathankablan\Bundle\FastEntityBundle\Command\MagicEntityCommand" public="true">
+            <argument type="service" id="fastentity.config.manager" />
+            <argument>%kernel.project_dir%</argument>
+            <tag name="console.command" command="magic:entity" />
+        </service>
     </services>
 </container>

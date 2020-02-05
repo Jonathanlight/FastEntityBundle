@@ -19,5 +19,10 @@ final class FastEntityConfigPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $configPasses = $this->findAndSortTaggedServices('fastentity.config_pass', $container);
+        $definition = $container->getDefinition('fastentity.config.manager');
+
+        foreach ($configPasses as $service) {
+            $definition->addMethodCall('addConfigPass', [$service]);
+        }
     }
 }

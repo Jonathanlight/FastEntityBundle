@@ -17,7 +17,6 @@ class Configuration implements ConfigurationInterface
         $rootNode = $this->getRootNode($treeBuilder, 'fast_entity');
 
         $this->addGlobalOptionsSection($rootNode);
-        $this->addUserSection($rootNode);
         $this->addEntitiesSection($rootNode);
 
         return $treeBuilder;
@@ -58,60 +57,6 @@ class Configuration implements ConfigurationInterface
                             ->defaultValue('%%y Year(s) %%m Month(s) %%d Day(s)')
                             ->info('The PHP dateinterval-compatible format applied to "dateinterval" field types.')
                             ->example('%%y Year(s) %%m Month(s) %%d Day(s) (see http://php.net/manual/en/dateinterval.format.php)')
-                        ->end()
-                    ->end()
-                ->end()
-
-                ->variableNode('disabled_actions')
-                    ->info('The names of the actions disabled for all backend entities.')
-                    ->defaultValue([])
-                    ->validate()
-                        ->ifTrue(function ($v) {
-                            return false === \is_array($v);
-                        })
-                        ->thenInvalid('The disabled_actions option must be an array of action names.')
-                    ->end()
-                ->end()
-
-                ->scalarNode('translation_domain')
-                    ->validate()
-                        ->ifTrue(function ($v) {
-                            return '' === $v;
-                        })
-                        ->thenInvalid('The translation_domain option cannot be an empty string (use false to disable translations).')
-                    ->end()
-                    ->defaultValue('messages')
-                    ->info('The translation domain used to translate the main menu and the labels, titles and help messages of all entities.')
-                ->end()
-            ->end()
-        ;
-    }
-
-    private function addUserSection(ArrayNodeDefinition $rootNode)
-    {
-        $rootNode
-            ->children()
-                ->arrayNode('user')
-                    ->addDefaultsIfNotSet()
-                    ->children()
-                        ->booleanNode('display_name')
-                            ->defaultTrue()
-                            ->info('If true, the user name is displayed in the logged user section.')
-                        ->end()
-
-                        ->booleanNode('display_avatar')
-                            ->defaultTrue()
-                            ->info('If true, the user avatar image is displayed in the logged user section.')
-                        ->end()
-
-                        ->scalarNode('name_property_path')
-                            ->defaultValue('__toString')
-                            ->info('A valid PropertyPath expression used to get the value of the user name (by default, __toString() is used).')
-                        ->end()
-
-                        ->scalarNode('avatar_property_path')
-                            ->defaultNull()
-                            ->info('A valid PropertyPath expression used to get the value of the avatar image path which is used as the "src" attribute of the <img> element.')
                         ->end()
                     ->end()
                 ->end()
