@@ -22,11 +22,6 @@ class FastEntityExtension extends Extension
         // load bundle's services
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.xml');
-
-        if ($container->getParameter('kernel.debug')) {
-            // in 'dev', use the built-in Symfony exception listener
-            $container->removeDefinition('fastentity.listener.exception');
-        }
     }
 
     /**
