@@ -29,6 +29,7 @@
     "symfony/framework-bundle": "^4.2|^5.0",
     "symfony/http-foundation": "^4.2|^5.0",
     "symfony/http-kernel": "^4.2|^5.0",
+    "symfony/maker-bundle": "^1.0@dev",
     "symfony/polyfill-mbstring": "^1.7",
     "symfony/property-access": "^4.2|^5.0",
     "symfony/security-bundle": "^4.2|^5.0",

@@ -8,10 +8,24 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Config\FileLocator;
 
 class MagicEntityCommand extends Command
 {
+    const FAST_ENTITY = 'fast_entity.yaml';
+
+    protected $configDirectories = [__DIR__.'/config'];
+
+    protected $yamlFiles;
+
     protected static $defaultName = 'magic:entity';
+
+    public function __construct(string $name = null)
+    {
+        parent::__construct($name);
+        $fileLocator = new FileLocator($this->configDirectories);
+        $this->yamlFiles = $fileLocator->locate(self::FAST_ENTITY, null, false);
+    }
 
     protected function configure()
     {
@@ -34,6 +48,8 @@ class MagicEntityCommand extends Command
         if ($input->getOption('option1')) {
             // ...
         }
+
+        dump($this->yamlFiles);
 
         $io->success('You have a new command! Now make it your own! Pass --help to see your options.');
 
