@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://travis-ci.org/joemccann/dillinger)
 
-FastEntityBundle Composant Bundle for Generate entity and relation with a config yaml
+FastEntityBundle Composant Bundle to Generate entity and relation with a config yaml
 
 ### Installation
 ```
