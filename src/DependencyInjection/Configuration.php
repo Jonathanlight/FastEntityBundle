@@ -34,7 +34,7 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('property')->end()
                             ->scalarNode('type')->end()
                             ->integerNode('length')
-                                ->min(0)->max(255)
+                                ->defaultValue(null)
                             ->end()
                             ->booleanNode('nullable')->end()
                         ->end()
