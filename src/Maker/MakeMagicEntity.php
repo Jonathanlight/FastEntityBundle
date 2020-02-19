@@ -9,10 +9,12 @@ use Jonathankablan\Bundle\FastEntityBundle\Configuration\SettingManager;
 use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Bundle\MakerBundle\DependencyBuilder;
 use Symfony\Bundle\MakerBundle\Doctrine\DoctrineHelper;
+use Symfony\Bundle\MakerBundle\Doctrine\EntityRegenerator;
 use Symfony\Bundle\MakerBundle\FileManager;
 use Symfony\Bundle\MakerBundle\Generator;
 use Symfony\Bundle\MakerBundle\InputConfiguration;
 use Symfony\Bundle\MakerBundle\Maker\AbstractMaker;
+use Symfony\Bundle\MakerBundle\MakerInterface;
 use Symfony\Bundle\MakerBundle\Str;
 use Symfony\Bundle\MakerBundle\Validator;
 use Symfony\Bundle\TwigBundle\TwigBundle;
@@ -23,42 +25,20 @@ use Symfony\Component\Console\Input\InputOption;
 
 final class MakeMagicEntity extends AbstractMaker
 {
-    /**
-     * @var SettingManager
-     */
+
     protected $setting;
-
-    /**
-     * @var FileManager
-     */
     private $fileManager;
-
-    /**
-     * @var DoctrineHelper
-     */
     private $doctrineHelper;
-
-    /**
-     * @var Generator
-     */
     private $generator;
 
-    /**
-     * @param SettingManager $setting
-     * @param FileManager $fileManager
-     * @param DoctrineHelper $doctrineHelper
-     * @param string $projectDirectory
-     * @param Generator|null $generator
-     */
     public function __construct(
-        SettingManager $setting,
         FileManager $fileManager,
         DoctrineHelper $doctrineHelper,
         string $projectDirectory,
         Generator $generator = null
     )
     {
-        $this->setting = $setting;
+        $this->setting = new SettingManager();
         $this->fileManager = $fileManager;
         $this->doctrineHelper = $doctrineHelper;
         // $projectDirectory is unused, argument kept for BC
@@ -86,44 +66,57 @@ final class MakeMagicEntity extends AbstractMaker
 
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator)
     {
-        $entityClassDetails = $generator->createClassNameDetails(
-            'Student',
-            'Entity\\',
-            'Entity'
-        );
+        $dataConfigYml = $this->setting->readYamlConfig();
 
-        $entityDoctrineDetails = $this->doctrineHelper->createDoctrineDetails($entityClassDetails->getFullName());
+        $tables = $dataConfigYml['fast_entity']['tables'];
 
-        $repositoryVars = [];
+        foreach ($tables as $table) {
+            $className = ucfirst($table['name']);
+            $entity_alias = strtolower($table['name'])[0];
+            $entity_full_class_name = 'App\Entity\\'.$className;
+            $repository_full_class_name = 'App\Repository\\'.$className.'Repository';
 
-        if (null !== $entityDoctrineDetails->getRepositoryClass()) {
-            $repositoryClassDetails = $generator->createClassNameDetails(
-                '\\'.$entityDoctrineDetails->getRepositoryClass(),
+            $entityClassNameDetails = $generator->createClassNameDetails(
+                $className,
+                'Entity\\',
+                ''
+            );
+
+            $generator->generateClass(
+                $entityClassNameDetails->getFullName(),
+                'doctrine/Entity.tpl.php',
+                [
+                    'api_resource' => true,
+                    'repository_full_class_name' => $repository_full_class_name,
+                    'class_name' => $className
+                ]
+            );
+    
+            $doctrineClassNameDetails = $generator->createClassNameDetails(
+                $className,
                 'Repository\\',
                 'Repository'
             );
-
-            $repositoryVars = [
-                'repository_full_class_name' => $repositoryClassDetails->getFullName(),
-                'repository_class_name' => $repositoryClassDetails->getShortName(),
-                'repository_var' => lcfirst(Inflector::singularize($repositoryClassDetails->getShortName())),
-            ];
+    
+            $generator->generateClass(
+                $doctrineClassNameDetails->getFullName(),
+                'doctrine/Repository.tpl.php',
+                [
+                    'entity_full_class_name' => $entity_full_class_name,
+                    'with_password_upgrade' => false,
+                    'entity_class_name' => $className,
+                    'api_resource' => true,
+                    'entity_alias' => $entity_alias,
+                    'repository_full_class_name' => $repository_full_class_name,
+                    'class_name' => $className
+                ]
+            );
         }
-
-        dump($this->setting->readYamlConfig());
-
-        $controllerPath = $generator->generateController(
-            $entityClassDetails->getFullName(),
-            'doctrine/Entity.tpl.php',
-            [
-                'route_path' => Str::asRoutePath($entityClassDetails->getRelativeNameWithoutSuffix()),
-                'route_name' => Str::asRouteName($entityClassDetails->getRelativeNameWithoutSuffix()),
-            ]
-        );
 
         $generator->writeChanges();
 
         $this->writeSuccessMessage($io);
+
         $io->text('Generate ...');
     }
 
@@ -138,5 +131,29 @@ final class MakeMagicEntity extends AbstractMaker
             Annotation::class,
             'doctrine/annotations'
         );
+    }
+
+    private function regenerateEntities(string $classOrNamespace, bool $overwrite, Generator $generator)
+    {
+        $regenerator = new EntityRegenerator($this->doctrineHelper, $this->fileManager, $generator, $overwrite);
+        $regenerator->regenerateEntities($classOrNamespace);
+    }
+
+    private function getPropertyNames(string $class): array
+    {
+        if (!class_exists($class)) {
+            return [];
+        }
+
+        $reflClass = new \ReflectionClass($class);
+
+        return array_map(function (\ReflectionProperty $prop) {
+            return $prop->getName();
+        }, $reflClass->getProperties());
+    }
+
+    private function getEntityNamespace(): string
+    {
+        return $this->doctrineHelper->getEntityNamespace();
     }
 }

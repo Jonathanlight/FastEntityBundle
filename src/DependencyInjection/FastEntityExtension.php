@@ -2,6 +2,8 @@
 
 namespace Jonathankablan\Bundle\FastEntityBundle\DependencyInjection;
 
+use Symfony\Bundle\MakerBundle\DependencyInjection\CompilerPass\MakeCommandRegistrationPass;
+use Symfony\Bundle\MakerBundle\MakerInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
@@ -21,6 +23,7 @@ class FastEntityExtension extends Extension
 
         // load bundle's services
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader->load('makers.xml');
         $loader->load('services.xml');
     }
 

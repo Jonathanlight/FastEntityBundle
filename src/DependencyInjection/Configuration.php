@@ -16,10 +16,29 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder('fast_entity');
         $rootNode = $this->getRootNode($treeBuilder, 'fast_entity');
 
+        $this->addEntitiesSection($rootNode);
         $this->addSchemaSection($rootNode);
         $this->addRelationOptionSection($rootNode);
 
         return $treeBuilder;
+    }
+
+    private function addEntitiesSection(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
+            ->fixXmlConfig('table')
+            ->children()
+                ->arrayNode('tables')
+                    ->arrayPrototype()
+                        ->children()
+                            ->scalarNode('name')
+                                ->isRequired()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
     }
 
     private function addSchemaSection(ArrayNodeDefinition $rootNode)
@@ -43,6 +62,7 @@ class Configuration implements ConfigurationInterface
             ->end()
         ;
     }
+
     private function addRelationOptionSection(ArrayNodeDefinition $rootNode)
     {
        // entityTo entityFrom relation

@@ -5,8 +5,9 @@ namespace <?= $namespace ?>;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="<?= $repository_full_class_name ?>")
- */
+<?php if ($api_resource): ?> * @ApiResource() <?php endif ?>
+* @ORM\Entity(repositoryClass="<?= $repository_full_class_name ?>")
+*/
 class <?= $class_name."\n" ?>
 {
     /**
